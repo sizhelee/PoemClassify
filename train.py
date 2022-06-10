@@ -8,7 +8,7 @@ from tqdm import tqdm, trange
 
 from model import EncoderRNN
 from preprocess import load_data, make_data
-from utils import cal_acc
+from utils import cal_acc, init_logger, write_log
 
 device = torch.device("cuda")
 
@@ -41,7 +41,7 @@ def train(epoch, model, batch_size, train_data, loss_fn, optimizer, word2idx, la
         optimizer.step()
 
         if iter % 10 == 0:
-            print("[Train]epoch {}, iter {}/{}, accuracy: {}, loss:{}".format(
+            write_log("[Train]epoch {}, iter {}/{}, accuracy: {}, loss:{}".format(
                 epoch, iter, len(train_data)//batch_size, round(batch_acc, 5), round(loss.item(), 5)))
 
 
@@ -56,7 +56,7 @@ def val(model, data, word2idx, label2idx, mode="Valid"):
     y_pred = np.argmax(outputs.detach().cpu().numpy(), axis=1)
     val_acc = cal_acc(y_pred, y.cpu().numpy(), None, False)
 
-    print("[{}]accuracy: {}".format(mode, round(val_acc, 5)))
+    write_log("[{}]accuracy: {}".format(mode, round(val_acc, 5)))
     return val_acc
     
 
@@ -68,6 +68,7 @@ def main():
     batch_size = 128
 
     model = EncoderRNN(len(word2idx), len(word2idx), 512, 5, batch_size)
+    # model = torch.load("best.pkl")
     optimizer = optim.Adam(model.parameters(), lr=5e-3)
     criterion = nn.CrossEntropyLoss()
 
@@ -88,4 +89,5 @@ def main():
 
 
 if __name__ == "__main__":
+    train_log = init_logger("train")
     main()
