@@ -17,7 +17,7 @@ np.random.seed(1)
 torch.manual_seed(1)
 
 
-def train(epoch, model, batch_size, train_data, loss_fn, optimizer, word2idx, label2idx):
+def train(epoch, model, batch_size, train_data, loss_fn, optimizer, word2idx, label2idx, train_log):
 
     model.train()
     model.cuda()
@@ -41,11 +41,11 @@ def train(epoch, model, batch_size, train_data, loss_fn, optimizer, word2idx, la
         optimizer.step()
 
         if iter % 10 == 0:
-            write_log("[Train]epoch {}, iter {}/{}, accuracy: {}, loss:{}".format(
+            write_log(train_log, "[Train]epoch {}, iter {}/{}, accuracy: {}, loss:{}".format(
                 epoch, iter, len(train_data)//batch_size, round(batch_acc, 5), round(loss.item(), 5)))
 
 
-def val(model, data, word2idx, label2idx, mode="Valid"):
+def val(model, data, word2idx, label2idx, train_log, mode="Valid"):
     
     model.eval()
     model.cpu()
@@ -56,12 +56,12 @@ def val(model, data, word2idx, label2idx, mode="Valid"):
     y_pred = np.argmax(outputs.detach().cpu().numpy(), axis=1)
     val_acc = cal_acc(y_pred, y.cpu().numpy(), None, False)
 
-    write_log("[{}]accuracy: {}".format(mode, round(val_acc, 5)))
+    write_log(train_log, "[{}]accuracy: {}".format(mode, round(val_acc, 5)))
     return val_acc
     
 
 
-def main():
+def main(train_log):
 
     word2idx, idx2word, label2idx, idx2label, train_data, valid_data, test_data = load_data()
     epochs = 5
@@ -72,22 +72,22 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=5e-3)
     criterion = nn.CrossEntropyLoss()
 
-    max_acc = val(model, valid_data, word2idx, label2idx, mode="Valid")
+    max_acc = val(model, valid_data, word2idx, label2idx, train_log, mode="Valid")
     # max_acc = 0
     for epoch in range(epochs):
         random.shuffle(train_data)
         print("Training epoch {}...".format(epoch+1))
-        train(epoch, model, batch_size, train_data, criterion, optimizer, word2idx, label2idx)
-        val_acc = val(model, valid_data, word2idx, label2idx, mode="Valid")
+        train(epoch, model, batch_size, train_data, criterion, optimizer, word2idx, label2idx, train_log)
+        val_acc = val(model, valid_data, word2idx, label2idx, train_log, mode="Valid")
         if val_acc > max_acc:
             max_acc = val_acc
             torch.save(model, "best.pkl")
             print("Successfully saved model!")
 
     model = torch.load("best.pkl")
-    test_acc = val(model, test_data, word2idx, label2idx, mode="Test")
+    test_acc = val(model, test_data, word2idx, label2idx, train_log, mode="Test")
 
 
 if __name__ == "__main__":
     train_log = init_logger("train")
-    main()
+    main(train_log)
