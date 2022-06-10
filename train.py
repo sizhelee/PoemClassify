@@ -81,6 +81,7 @@ def main():
         if val_acc > max_acc:
             max_acc = val_acc
             torch.save(model, "best.pkl")
+            print("Successfully saved model!")
 
     model = torch.load("best.pkl")
     test_acc = val(model, test_data, word2idx, label2idx, mode="Test")
