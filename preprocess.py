@@ -50,6 +50,13 @@ def label2onehot(label, word2idx):
     return onehot
 
 
+def w2i(x, word2idx):
+    if x in word2idx.keys():
+        return word2idx[x]
+    else:
+        return 0
+
+
 def make_data(text, author, word2idx, label2idx):
     """
     输入
@@ -61,7 +68,7 @@ def make_data(text, author, word2idx, label2idx):
     """
     x_ls, mask = [], []
     for onetext in text:
-        x = label2onehot(torch.tensor(list(map(lambda x: word2idx[x], onetext))), word2idx)
+        x = label2onehot(torch.tensor(list(map(lambda x: w2i(x, word2idx), onetext))), word2idx)
         x_ls.append(x)
         mask.append(torch.ones_like(x[:,0]))
     x = pad_sequence(x_ls).transpose(0, 1)
