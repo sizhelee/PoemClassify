@@ -41,14 +41,26 @@ class BiLSTM(nn.Module):
         # TODO
         self.fLSTM = LSTM(input_size, hidden_size)
         self.bLSTM = LSTM(input_size, hidden_size)
-        self.register_buffer("_float", torch.zeros(batch_size, hidden_size))
+        self.register_buffer("_batch", torch.zeros(batch_size, hidden_size))
+        self.register_buffer("_valid", torch.zeros(1408, hidden_size))
+        self.register_buffer("_test", torch.zeros(1410, hidden_size))
+        self.batch_size = batch_size
+        self.hidden_size = hidden_size
     
-    def init_h_and_c(self):
-        h = torch.zeros_like(self._float)
-        c = torch.zeros_like(self._float)
+    def init_h_and_c(self, mode):
+        if mode == "Train":
+            h = torch.zeros_like(self._batch)
+            c = torch.zeros_like(self._batch)
+        elif mode == "Valid":
+            h = torch.zeros_like(self._valid)
+            c = torch.zeros_like(self._valid)
+        elif mode == "Test":
+            h = torch.zeros_like(self._test)
+            c = torch.zeros_like(self._test)
+        
         return h, c
     
-    def forward(self, x):
+    def forward(self, x, mode="Train"):
         """
         输入
             x: 1 * length * input_size
@@ -58,8 +70,8 @@ class BiLSTM(nn.Module):
         # TODO
 
         B, length = x.shape[0], x.shape[1]
-        hf, cf = self.init_h_and_c()
-        hb, cb = self.init_h_and_c()
+        hf, cf = self.init_h_and_c(mode)
+        hb, cb = self.init_h_and_c(mode)
         hidden_f, hidden_b = [], []
 
         for i in range(length):
@@ -128,7 +140,7 @@ class EncoderRNN(nn.Module):
             nn.LogSoftmax()
         )
     
-    def forward(self, x, mask=None):
+    def forward(self, x, mode, mask=None):
         """
         输入
             x: 1 * length, LongTensor -> 1 * length * input_size
@@ -136,7 +148,7 @@ class EncoderRNN(nn.Module):
             outputs: 1 * num_classes
         """
         # TODO
-        wordfeats = self.Encoder(x) # 1 * length * (hidden_size*2)
+        wordfeats = self.Encoder(x, mode) # 1 * length * (hidden_size*2)
         sentfeat = self.selfatt(wordfeats, mask)  # 1 * (hidden_size*2)
         outputs = self.linear_layers(sentfeat)  # 1 * num_classes
         
