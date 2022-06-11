@@ -42,7 +42,7 @@ PoemClassify
 - hidden state size: 512
 - 优化器: Adam
 - 学习率: 5e-3
-- 训练环境：NVIDIA GeForce RTX 2080
+- 训练环境：NVIDIA GeForce RTX 2080(约5分钟)
 
 ### 性能
 
