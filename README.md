@@ -38,10 +38,11 @@ PoemClassify
 ### 参数
 
 - 训练batch_size: 128
-- 训练epoch: 5
+- 训练epoch: 20
 - hidden state size: 512
 - 优化器: Adam
 - 学习率: 5e-3
+- 训练环境：NVIDIA GeForce RTX 2080
 
 ### 性能
 
