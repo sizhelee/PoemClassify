@@ -20,6 +20,19 @@
 
 Embedding – BiLSTM – Attention – Linear – LogSoftmax
 
+```python
+PoemClassify
+      ├──── data    # 训练数据
+      |      ├──── train.txt
+      |      ├──── valid.txt
+      |      └──── test.txt
+      ├──── model.py    # 模型架构
+      ├──── preprocess.py   # 数据预处理
+      ├──── train.py    # 主函数，训练代码
+      ├──── utils.py    # 其余函数
+      └──── best.pkl    # 最佳模型
+```
+
 ## 模型实现
 
 ### 参数
@@ -34,7 +47,17 @@ Embedding – BiLSTM – Attention – Linear – LogSoftmax
 
 - **Valid Set: 34.659**
 
-- **Test Set:**
+- **Test Set: 33.191**
+
+类别|李商隐|李白|杜甫|刘禹锡|杜牧|召回样本|召回率|F1
+----|-----|----|---|------|----|-------|-----|---
+李商隐| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+李白| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+杜甫| 160 | 415 | 469 | 237 | 132 | 469 | 1 | 0 |
+刘禹锡| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+杜牧| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+总计| 160 | 415 | 469 | 237 | 132 |
+准确率| 0 | 0 | 1 | 0 | 0 |
 
 ## 训练&测试模型
 

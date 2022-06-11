@@ -137,7 +137,7 @@ class EncoderRNN(nn.Module):
         self.selfatt = Attention(hidden_size*2)
         self.linear_layers = nn.Sequential(
             nn.Linear(hidden_size*2, num_classes), 
-            nn.LogSoftmax()
+            nn.Softmax()
         )
     
     def forward(self, x, mode, mask=None):
